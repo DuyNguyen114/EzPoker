@@ -1,0 +1,92 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{251E90F2-E889-4DC0-95D0-378203E28070}|PokerTrainer.Mobile\\PokerTrainer.Mobile.csproj|d:\\t\u1EF1 h\u1ECDc\\ezpoker\\ezpoker\\pokertrainer.mobile\\pokertrainer.mobile.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{251E90F2-E889-4DC0-95D0-378203E28070}|PokerTrainer.Mobile\\PokerTrainer.Mobile.csproj|solutionrelative:pokertrainer.mobile\\pokertrainer.mobile.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D1187B2-FE6C-45B0-851B-44A2A561B239}|PokerTrainer\\PokerTrainer.csproj|d:\\t\u1EF1 h\u1ECDc\\ezpoker\\ezpoker\\pokertrainer\\pokertrainer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{8D1187B2-FE6C-45B0-851B-44A2A561B239}|PokerTrainer\\PokerTrainer.csproj|solutionrelative:pokertrainer\\pokertrainer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FA7C46EB-5FF6-40D3-85E1-32F506CF6552}|PokerTrainer.Core.Tests\\PokerTrainer.Core.Tests.csproj|d:\\t\u1EF1 h\u1ECDc\\ezpoker\\ezpoker\\pokertrainer.core.tests\\unittest1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FA7C46EB-5FF6-40D3-85E1-32F506CF6552}|PokerTrainer.Core.Tests\\PokerTrainer.Core.Tests.csproj|solutionrelative:pokertrainer.core.tests\\unittest1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D1187B2-FE6C-45B0-851B-44A2A561B239}|PokerTrainer\\PokerTrainer.csproj|d:\\t\u1EF1 h\u1ECDc\\ezpoker\\ezpoker\\pokertrainer\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D1187B2-FE6C-45B0-851B-44A2A561B239}|PokerTrainer\\PokerTrainer.csproj|solutionrelative:pokertrainer\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PokerTrainer",
+              "DocumentMoniker": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer\\PokerTrainer.csproj",
+              "RelativeDocumentMoniker": "PokerTrainer\\PokerTrainer.csproj",
+              "ToolTip": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer\\PokerTrainer.csproj",
+              "RelativeToolTip": "PokerTrainer\\PokerTrainer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-11-18T15:39:31.125Z",
+              "EditorCaption": "",
+              "OwnerCaption": "PokerTrainer"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PokerTrainer.Mobile",
+              "DocumentMoniker": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer.Mobile\\PokerTrainer.Mobile.csproj",
+              "RelativeDocumentMoniker": "PokerTrainer.Mobile\\PokerTrainer.Mobile.csproj",
+              "ToolTip": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer.Mobile\\PokerTrainer.Mobile.csproj",
+              "RelativeToolTip": "PokerTrainer.Mobile\\PokerTrainer.Mobile.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-11-18T15:35:43.621Z",
+              "EditorCaption": "",
+              "OwnerCaption": "PokerTrainer.Mobile"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UnitTest1.cs",
+              "DocumentMoniker": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer.Core.Tests\\UnitTest1.cs",
+              "RelativeDocumentMoniker": "PokerTrainer.Core.Tests\\UnitTest1.cs",
+              "ToolTip": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer.Core.Tests\\UnitTest1.cs",
+              "RelativeToolTip": "PokerTrainer.Core.Tests\\UnitTest1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-18T15:35:15.762Z",
+              "EditorCaption": "",
+              "OwnerCaption": "%2"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer\\Class1.cs",
+              "RelativeDocumentMoniker": "PokerTrainer\\Class1.cs",
+              "ToolTip": "D:\\t\u1EF1 h\u1ECDc\\EzPoker\\EzPoker\\PokerTrainer\\Class1.cs",
+              "RelativeToolTip": "PokerTrainer\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-18T15:32:02.601Z",
+              "EditorCaption": "",
+              "OwnerCaption": "%2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

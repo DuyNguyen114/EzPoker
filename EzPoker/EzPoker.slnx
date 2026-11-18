@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="PokerTrainer.Mobile/PokerTrainer.Mobile.csproj" />
+    <Project Path="PokerTrainer/PokerTrainer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="PokerTrainer.Core.Tests/PokerTrainer.Core.Tests.csproj" />
+  </Folder>
+</Solution>
