@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PokerTrainer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b45b73395b46245797c84abfdedeb3546bbf5e4e")]
 [assembly: System.Reflection.AssemblyProductAttribute("PokerTrainer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PokerTrainer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
