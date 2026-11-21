@@ -2,6 +2,8 @@
 using PokerTrainer.Models;
 using System;
 using System.Collections.Generic;
+using System.Net.WebSockets;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace PokerTrainer.Services
@@ -238,6 +240,12 @@ namespace PokerTrainer.Services
                     $"Mức cược tối thiểu bằng Big Blind ({hand.BigBlind}).");
             }
 
+            if(amount >= player.Stack)
+            {
+                throw new InvalidOperationException(
+                    "Vui lòng sử dụng all-in.");
+            }
+
             CommitChips(player, amount);
 
             hand.RegisterBet(player.StreetCommitted);
@@ -253,6 +261,88 @@ namespace PokerTrainer.Services
             hand.AddAction(action);
         }
 
-        public void R
+        public void RaiseTo(PokerTable table, Player player, decimal totalStreetBet)
+        {
+            PokerHand hand = GetCurrentHand(table);
+            
+            EnsurePlayerCanAct(table, player);
+
+            if (hand.CurrentBet <= 0)
+            {
+                throw new InvalidOperationException("Chưa có ai bet. Hãy sử dụng Bet.");
+            }
+
+            if(totalStreetBet < hand.MinimumRaiseTo)
+            {
+                throw new InvalidOperationException(
+                    $"Mức raise tối thiểu là {hand.MinimumRaiseTo}.");
+            }
+
+            decimal amountToAdd = totalStreetBet - player.StreetCommitted;
+
+            if(amountToAdd <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Người chơi đã commit đủ số chip để đạt mức raise này.");
+            }
+
+            if(amountToAdd >= player.Stack)
+            {
+                throw new InvalidOperationException(
+                    "Người chơi không đủ chip để raise, nếu dùng toàn bộ chip vui lòng sử dụng all-in.");
+            }
+
+            CommitChips(player, amountToAdd);
+
+            hand.RegisterRaise(totalStreetBet);
+
+            var action = new PokerAction(player.Id,
+                player.Name,
+                hand.CurrentStreet,
+                PokerActionType.Raise,
+                amountToAdd,
+                player.StreetCommitted);
+
+            hand.AddAction(action);
+        }
+
+        public void AllIn(PokerTable table, Player player)
+        {
+            PokerHand hand = GetCurrentHand(table);
+
+            EnsurePlayerCanAct(table, player);
+
+            decimal amountAdded = player.Stack;
+
+            if(amountAdded <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Người chơi không còn chip để all-in.");
+            }
+
+            decimal newTotalStreetBet = player.StreetCommitted + amountAdded;
+
+            decimal oldCurrentBet = hand.CurrentBet;
+
+            CommitChips(player, amountAdded);
+
+            if (oldCurrentBet == 0)
+            {
+                hand.RegisterBet(newTotalStreetBet);
+            }
+            else
+            {
+                hand.RegisterRaise(newTotalStreetBet);
+            }
+            var action = new PokerAction(
+                player.Id,
+                player.Name,
+                hand.CurrentStreet,
+                PokerActionType.AllIn,
+                amountAdded,
+                player.StreetCommitted);
+
+            hand.AddAction(action);
+        }
     }
 }

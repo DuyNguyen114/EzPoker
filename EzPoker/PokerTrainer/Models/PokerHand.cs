@@ -22,8 +22,8 @@ namespace PokerTrainer.Models
         //Mức cược cao nhất trong street hiện tại
         public decimal CurrentBet { get; private set; }
         // Kích thước lần bet/raise gần nhất
-        public decimal LastFullRaiseSize { get; private set; }
-        public decimal MinimumRaiseTo => CurrentBet + LastFullRaiseSize;
+        public decimal MinimumRaiseIncrement { get; private set; }
+        public decimal MinimumRaiseTo => CurrentBet + MinimumRaiseIncrement;
         public IReadOnlyList<PokerAction> Actions => _actions.AsReadOnly();
         public decimal TotalPot => _actions.Sum(action => action.AmountAdded);
         public PokerHand(int handNumber, int buttonSeat, decimal smallBlind, decimal bigBlind)
@@ -59,7 +59,7 @@ namespace PokerTrainer.Models
             BigBlind = bigBlind;
             CurrentStreet = PokerStreet.PreFlop;
             CurrentBet = 0;
-            LastFullRaiseSize = bigBlind;
+            MinimumRaiseIncrement = bigBlind;
         }
 
         public decimal GetPotForStreet(PokerStreet street)
@@ -111,7 +111,7 @@ namespace PokerTrainer.Models
 
             // Sang vòng mới cập nhật lại bet
             CurrentBet = 0;
-            LastFullRaiseSize = BigBlind;
+            MinimumRaiseIncrement = BigBlind;
         }
 
         private bool IsValidNextStreet(PokerStreet nextStreet)
@@ -153,7 +153,7 @@ namespace PokerTrainer.Models
             }
 
             CurrentBet = betAmount;
-            LastFullRaiseSize = betAmount;
+            MinimumRaiseIncrement = betAmount;
         }
 
         public void RegisterRaise(decimal newTotalBet)
@@ -175,9 +175,9 @@ namespace PokerTrainer.Models
             CurrentBet = newTotalBet;
 
             // Short all-in không làm thay đổi mức full raise gần nhất
-            if(raiseSize >= LastFullRaiseSize)
+            if(raiseSize >= MinimumRaiseIncrement)
             {
-                LastFullRaiseSize = raiseSize;
+                MinimumRaiseIncrement = raiseSize;
             }
         }
     }

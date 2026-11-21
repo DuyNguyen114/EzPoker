@@ -15,5 +15,12 @@ namespace PokerTrainer.Models
         public bool IsAllIn { get; set; }
         public decimal StreetCommitted { get; set; }
         public decimal TotalCommitted { get; set; }
+
+        public Player(string name, int seatNumber, decimal stack)
+        {
+            Name = name;
+            SeatNumber = seatNumber;
+            Stack = stack;
+        }
     }
 }
