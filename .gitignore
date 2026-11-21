@@ -1,0 +1,3 @@
+# Bỏ qua bin và obj ở mọi cấp thư mục
+[Bb]in/
+[Oo]bj/
