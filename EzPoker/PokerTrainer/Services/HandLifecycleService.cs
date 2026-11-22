@@ -10,10 +10,12 @@ namespace PokerTrainer.Services
     public class HandLifecycleService
     {
         private readonly IBettingService _bettingService;
+        private readonly ITurnOrderService _turnOrderService;
 
-        public HandLifecycleService(IBettingService bettingService)
+        public HandLifecycleService(IBettingService bettingService, ITurnOrderService turnOrderService)
         {
             _bettingService = bettingService;
+            _turnOrderService = turnOrderService;
         }
 
         public void StartNewHand(PokerTable table, int buttonSeat, decimal smallBlind, decimal bigBlind)
@@ -114,6 +116,12 @@ namespace PokerTrainer.Services
                     "Hand phải được kết thúc thay vì chuyển street.");
             }
 
+            if (!_turnOrderService.IsBettingRoundComplete(table))
+            {
+                throw new InvalidOperationException(
+                    "Vòng cược hiện tại chưa kết thúc.");
+            }
+
             PokerStreet nextStreet = GetNextStreet(hand.CurrentStreet);
 
             ResetStreetCommitments(table);
@@ -151,6 +159,7 @@ namespace PokerTrainer.Services
                 player.IsAllIn = false;
                 player.StreetCommitted = 0;
                 player.TotalCommitted = 0;
+                player.HasActedThisStreet = false;
             }
         }
 
@@ -159,6 +168,7 @@ namespace PokerTrainer.Services
             foreach (Player player in table.Players)
             {
                 player.StreetCommitted = 0;
+                player.HasActedThisStreet = false;
             }
         }
 

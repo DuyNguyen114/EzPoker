@@ -16,6 +16,8 @@ namespace PokerTrainer.Models
         public decimal StreetCommitted { get; set; }
         public decimal TotalCommitted { get; set; }
 
+        public bool HasActedThisStreet { get; set; }
+
         public Player(string name, int seatNumber, decimal stack)
         {
             Name = name;

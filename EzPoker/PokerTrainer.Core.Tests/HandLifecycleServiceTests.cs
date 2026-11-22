@@ -28,10 +28,13 @@ public class HandLifecycleServiceTests
 
         var bettingService =
             new BettingService();
+        ITurnOrderService turnOrderService =
+    new TurnOrderService();
+
 
         var lifecycleService =
             new HandLifecycleService(
-                bettingService);
+                bettingService, turnOrderService);
 
         lifecycleService.StartNewHand(
             table,
@@ -85,9 +88,11 @@ public class HandLifecycleServiceTests
         var bettingService =
             new BettingService();
 
+        ITurnOrderService turnOrderService = new TurnOrderService();
+
         var lifecycleService =
             new HandLifecycleService(
-                bettingService);
+                bettingService, turnOrderService);
 
         lifecycleService.StartNewHand(
             table,
@@ -99,13 +104,25 @@ public class HandLifecycleServiceTests
             table,
             button);
 
+        turnOrderService.AdvanceAfterAction(
+            table,
+            reopensBetting: false);
+
         bettingService.Call(
             table,
             smallBlind);
 
+        turnOrderService.AdvanceAfterAction(
+            table,
+            reopensBetting: false);
+
         bettingService.Check(
             table,
             bigBlind);
+
+        turnOrderService.AdvanceAfterAction(
+            table,
+            reopensBetting: false);
 
         lifecycleService.MoveToNextStreet(
             table);
@@ -161,9 +178,12 @@ public class HandLifecycleServiceTests
         IBettingService bettingService =
             new BettingService();
 
+        ITurnOrderService turnOrderService =
+    new TurnOrderService();
+
         var lifecycleService =
             new HandLifecycleService(
-                bettingService);
+                bettingService, turnOrderService);
 
         // Act
         lifecycleService.StartNewHand(
@@ -201,4 +221,155 @@ public class HandLifecycleServiceTests
     }
 
 
+    // Test khong duoc chuyen street som
+    [Fact]
+    public void MoveToNextStreet_WhenRoundNotComplete_ShouldThrow()
+    {
+        // Arrange
+        var table =
+            new PokerTable("Test table");
+
+        var button =
+            new Player("Button", 1, 1000);
+
+        var smallBlind =
+            new Player("Small Blind", 2, 1000);
+
+        var bigBlind =
+            new Player("Big Blind", 3, 1000);
+
+        table.AddPlayer(button);
+        table.AddPlayer(smallBlind);
+        table.AddPlayer(bigBlind);
+
+        IBettingService bettingService =
+            new BettingService();
+
+        ITurnOrderService turnOrderService =
+            new TurnOrderService();
+
+        var lifecycleService =
+            new HandLifecycleService(
+                bettingService,
+                turnOrderService);
+
+        lifecycleService.StartNewHand(
+            table,
+            buttonSeat: 1,
+            smallBlind: 10,
+            bigBlind: 20);
+
+        // Chưa ai hành động
+
+        // Act
+        InvalidOperationException exception =
+            Assert.Throws<InvalidOperationException>(
+                () =>
+                    lifecycleService.MoveToNextStreet(
+                        table));
+
+        // Assert
+        Assert.Contains(
+            "chưa kết thúc",
+            exception.Message);
+
+        Assert.Equal(
+            PokerStreet.PreFlop,
+            table.CurrentHand!.CurrentStreet);
+    }
+
+
+    // duoc chuyen street khi vong cuoc hoan thanh
+    [Fact]
+    public void MoveToNextStreet_WhenRoundComplete_ShouldMoveToFlop()
+    {
+        // Arrange
+        var table =
+            new PokerTable("Test table");
+
+        var button =
+            new Player("Button", 1, 1000);
+
+        var smallBlind =
+            new Player("Small Blind", 2, 1000);
+
+        var bigBlind =
+            new Player("Big Blind", 3, 1000);
+
+        table.AddPlayer(button);
+        table.AddPlayer(smallBlind);
+        table.AddPlayer(bigBlind);
+
+        IBettingService bettingService =
+            new BettingService();
+
+        ITurnOrderService turnOrderService =
+            new TurnOrderService();
+
+        var lifecycleService =
+            new HandLifecycleService(
+                bettingService,
+                turnOrderService);
+
+        lifecycleService.StartNewHand(
+            table,
+            buttonSeat: 1,
+            smallBlind: 10,
+            bigBlind: 20);
+
+        // Button call
+        bettingService.Call(
+            table,
+            button);
+
+        turnOrderService.AdvanceAfterAction(
+            table,
+            reopensBetting: false);
+
+        // SB call thêm 10
+        bettingService.Call(
+            table,
+            smallBlind);
+
+        turnOrderService.AdvanceAfterAction(
+            table,
+            reopensBetting: false);
+
+        // BB check
+        bettingService.Check(
+            table,
+            bigBlind);
+
+        turnOrderService.AdvanceAfterAction(
+            table,
+            reopensBetting: false);
+
+        Assert.True(
+            turnOrderService
+                .IsBettingRoundComplete(table));
+
+        // Act
+        lifecycleService.MoveToNextStreet(
+            table);
+
+        // Assert
+        Assert.Equal(
+            PokerStreet.Flop,
+            table.CurrentHand!.CurrentStreet);
+
+        Assert.Equal(
+            0m,
+            table.CurrentHand.CurrentBet);
+
+        Assert.All(
+            table.Players,
+            player =>
+                Assert.Equal(
+                    0m,
+                    player.StreetCommitted));
+
+        Assert.Equal(
+            smallBlind.Id,
+            table.CurrentPlayer!.Id);
+    }
 }

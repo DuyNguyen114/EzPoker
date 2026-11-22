@@ -23,6 +23,10 @@ namespace PokerTrainer.Mobile
             //add service
             builder.Services.AddSingleton<IBettingService, BettingService>();
 
+            builder.Services.AddSingleton<ITurnOrderService, TurnOrderService>();
+
+            builder.Services.AddSingleton<IPokerGameService, PokerGameService>();
+
             builder.Services.AddSingleton<HandLifecycleService>();
 #endif
 
