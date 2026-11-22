@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using PokerTrainer.Services;
 
 namespace PokerTrainer.Mobile
 {
@@ -17,6 +18,12 @@ namespace PokerTrainer.Mobile
 
 #if DEBUG
     		builder.Logging.AddDebug();
+
+
+            //add service
+            builder.Services.AddSingleton<IBettingService, BettingService>();
+
+            builder.Services.AddSingleton<HandLifecycleService>();
 #endif
 
             return builder.Build();

@@ -97,31 +97,39 @@ namespace PokerTrainer.Models
             CurrentPlayerIndex = -1;
         }
 
-        public void SetCurrentPlayer(int index)
+        public void SetCurrentPlayerIndex(int index)
         {
             if (CurrentHand is null)
             {
                 throw new InvalidOperationException(
-                    "Không có hand nào đang diễn ra.");
+                    "Chưa có hand đang diễn ra.");
             }
-            
-            if(index < 0 || index >= _players.Count)
+
+            if (index < 0 || index >= _players.Count)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(index),
-                    $"Vị trí {index} không hợp lệ.");
+                    "Vị trí người chơi không hợp lệ.");
             }
 
             Player player = _players[index];
 
             if (player.HasFolded)
             {
-                throw new InvalidOperationException("Người chơi đã fold");
+                throw new InvalidOperationException(
+                    "Không thể chuyển lượt cho người đã fold.");
             }
 
-            if(player.IsAllIn)
+            if (player.IsAllIn)
             {
-                throw new InvalidOperationException("Người chơi đã all-in");
+                throw new InvalidOperationException(
+                    "Không thể chuyển lượt cho người đã all-in.");
+            }
+
+            if (player.Stack <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Không thể chuyển lượt cho người không còn chip.");
             }
 
             CurrentPlayerIndex = index;
@@ -155,5 +163,10 @@ namespace PokerTrainer.Models
                     "Không thể thực hiện thao tác này khi đang có hand diễn ra.");
             }
         }
+        public void ClearCurrentPlayer()
+        {
+            CurrentPlayerIndex = -1;
+        }
+
     }
 }

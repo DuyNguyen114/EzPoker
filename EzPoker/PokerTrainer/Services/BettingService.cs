@@ -8,7 +8,7 @@ using System.Text;
 
 namespace PokerTrainer.Services
 {
-    public class BettingService
+    public class BettingService : IBettingService
     {
         public decimal GetCallAmount(PokerTable table, Player player)
         {
