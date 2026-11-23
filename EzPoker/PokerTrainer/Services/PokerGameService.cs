@@ -10,11 +10,13 @@ namespace PokerTrainer.Services
         private readonly IBettingService _bettingService;
         private readonly ITurnOrderService _turnOrderService;
         private readonly HandLifecycleService _handLifecycleService;
+        private readonly IPotService _potService;
 
         public PokerGameService(
             IBettingService bettingService,
             ITurnOrderService turnOrderService,
-            HandLifecycleService handLifecycleService)
+            HandLifecycleService handLifecycleService,
+            IPotService potService)
         {
             _bettingService =
                 bettingService
@@ -30,6 +32,9 @@ namespace PokerTrainer.Services
                 handLifecycleService
                 ?? throw new ArgumentNullException(
                     nameof(handLifecycleService));
+            _potService = potService
+                ?? throw new ArgumentNullException(
+                    nameof(potService));
         }
 
         public void Fold(PokerTable table)
@@ -39,6 +44,13 @@ namespace PokerTrainer.Services
             _bettingService.Fold(table, player);
 
             _turnOrderService.AdvanceAfterAction(table, false);
+
+            int remainingPlayers = table.Players.Count(p => !p.HasFolded);
+
+            if(remainingPlayers == 1)
+            {
+                _potService.AwardToLastRemainingPlayer(table);
+            }
         }
 
         public void Check(PokerTable table)
@@ -166,5 +178,12 @@ namespace PokerTrainer.Services
             ?? throw new InvalidOperationException(
                 "Chưa có hand đang diễn ra.");
         }
+        public decimal AwardPot(PokerTable table, Guid winnerId)
+        {
+            return _potService.AwardEntirePot(
+                table,
+                winnerId);
+        }
+
     }
 }

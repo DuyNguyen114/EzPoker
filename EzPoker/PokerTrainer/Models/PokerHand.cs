@@ -26,6 +26,9 @@ namespace PokerTrainer.Models
         public decimal MinimumRaiseTo => CurrentBet + MinimumRaiseIncrement;
         public IReadOnlyList<PokerAction> Actions => _actions.AsReadOnly();
         public decimal TotalPot => _actions.Sum(action => action.AmountAdded);
+        public Guid? WinnerId { get; private set; }
+        public string? WinnerName { get; private set; }
+        public decimal AwardedPot { get; private set; }
         public PokerHand(int handNumber, int buttonSeat, decimal smallBlind, decimal bigBlind)
         {
             if (handNumber <= 0)
@@ -179,6 +182,43 @@ namespace PokerTrainer.Models
             {
                 MinimumRaiseIncrement = raiseSize;
             }
+        }
+
+        public void MarkCompleted(Guid winnerId, string winnerName, decimal awardedPot)
+        {
+            if (CurrentStreet == PokerStreet.Completed)
+            {
+                throw new InvalidOperationException(
+                    "Hand đã kết thúc.");
+            }
+
+            if (winnerId == Guid.Empty)
+            {
+                throw new ArgumentException(
+                    "WinnerId không hợp lệ.",
+                    nameof(winnerId));
+            }
+
+            if (string.IsNullOrWhiteSpace(winnerName))
+            {
+                throw new ArgumentException(
+                    "Tên người thắng không hợp lệ.",
+                    nameof(winnerName));
+            }
+
+            if (awardedPot <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(awardedPot),
+                    "Pot trao thưởng phải lớn hơn 0.");
+            }
+
+            WinnerId = winnerId;
+            WinnerName = winnerName.Trim();
+            AwardedPot = awardedPot;
+
+            CurrentBet = 0;
+            CurrentStreet = PokerStreet.Completed;
         }
     }
 }

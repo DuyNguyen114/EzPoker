@@ -196,7 +196,7 @@ namespace PokerTrainer.Services
         {
             ArgumentNullException.ThrowIfNull(player, nameof(player));
 
-            if (table.Players.Any(
+            if (!table.Players.Any(
                 tablePlayer =>
                     tablePlayer.Id == player.Id))
             {

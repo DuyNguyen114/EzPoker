@@ -26,7 +26,7 @@ namespace PokerTrainer.Mobile
             builder.Services.AddSingleton<ITurnOrderService, TurnOrderService>();
 
             builder.Services.AddSingleton<IPokerGameService, PokerGameService>();
-
+            builder.Services.AddSingleton<IPotService, PotService>();
             builder.Services.AddSingleton<HandLifecycleService>();
 #endif
 

@@ -44,12 +44,11 @@ public class TurnOrderServiceTests
         IBettingService bettingService =
             new BettingService();
 
+        ITurnOrderService turnOrderService = new TurnOrderService();
+
         var lifecycleService =
             new HandLifecycleService(
-                bettingService);
-
-        ITurnOrderService turnOrderService =
-            new TurnOrderService();
+                bettingService, turnOrderService);
 
         lifecycleService.StartNewHand(
             table,

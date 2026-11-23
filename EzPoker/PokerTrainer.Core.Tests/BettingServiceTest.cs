@@ -21,7 +21,9 @@ namespace PokerTrainer.Core.Tests
             table.AddPlayer(bigBlind);
 
             var hand = new PokerHand(1, 1, 10, 20);
-            
+
+            table.StartHand(hand);
+
             var service = new BettingService();
 
             return (table, button, smallBlind, bigBlind, service);

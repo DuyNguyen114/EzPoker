@@ -25,5 +25,6 @@ namespace PokerTrainer.Services
 
         void MoveToNextStreet(
             PokerTable table);
+        decimal AwardPot(PokerTable table, Guid winnerId);
     }
 }

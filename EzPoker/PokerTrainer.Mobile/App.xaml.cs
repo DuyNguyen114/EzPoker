@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PokerTrainer.Mobile.Views;
 
 namespace PokerTrainer.Mobile
 {
@@ -7,6 +8,8 @@ namespace PokerTrainer.Mobile
         public App()
         {
             InitializeComponent();
+
+            //MainPage = new NavigationPage(new PokerTablePage());
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

@@ -39,11 +39,15 @@ namespace PokerTrainer.Core.Tests
                     bettingService,
                     turnOrderService);
 
+            var potService =
+                new PotService();
+
             IPokerGameService gameService =
                 new PokerGameService(
                     bettingService,
                     turnOrderService,
-                    lifecycleService);
+                    lifecycleService,
+                    potService);
 
             lifecycleService.StartNewHand(
                 table,
@@ -110,11 +114,15 @@ namespace PokerTrainer.Core.Tests
                     bettingService,
                     turnOrderService);
 
+            var potService =
+                new PotService();
+
             IPokerGameService gameService =
                 new PokerGameService(
                     bettingService,
                     turnOrderService,
-                    lifecycleService);
+                    lifecycleService,
+                    potService);
 
             lifecycleService.StartNewHand(
                 table,
