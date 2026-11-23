@@ -136,6 +136,13 @@
                            TextColor="White"
                            HorizontalTextAlignment="Center" />
 
+                    <Label x:Name="StreetPotLabel"
+                           Text="Street: 0"
+                           FontSize="12"
+                           TextColor="#B9C8BF"
+                           HorizontalTextAlignment="Center"
+                        />
+
                     <!-- Community cards -->
                     <HorizontalStackLayout Spacing="6">
 
@@ -231,7 +238,8 @@
                     FontAttributes="Bold"
                     Clicked="Fold_Clicked" />
 
-            <Button Grid.Column="1"
+            <Button x:Name="CallButton"
+                    Grid.Column="1"
                     Text="CALL 40"
                     HeightRequest="54"
                     BackgroundColor="#222B25"
