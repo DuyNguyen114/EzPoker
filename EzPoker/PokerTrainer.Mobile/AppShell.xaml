@@ -9,8 +9,8 @@
     Shell.FlyoutBehavior="Disabled">
 
     <ShellContent
-        Title="Bàn poker"
-        Route="PokerTablePage"
-        ContentTemplate="{DataTemplate views:PokerTablePage}" />
+        Title="Thiết lập bàn"
+        Route="TableSetup"
+        ContentTemplate="{DataTemplate views:TableSetupPage}" />
 
 </Shell>

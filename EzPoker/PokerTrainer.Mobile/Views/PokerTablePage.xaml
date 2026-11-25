@@ -7,7 +7,7 @@
     Title="Poker Table"
     BackgroundColor="#101512">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto"
           Padding="16"
           RowSpacing="12">
 
@@ -27,13 +27,14 @@
                                  HorizontalOptions="Center"
                                  Spacing="2">
 
-                <Label Text="Hand #1"
+                <Label x:Name="HandTitleLabel"
+                       Text="Hand #1"
                        FontSize="18"
                        FontAttributes="Bold"
                        TextColor="White"
                        HorizontalTextAlignment="Center" />
 
-                <Label Text="No Limit Hold'em • 10 / 20"
+                <Label x:Name="BlindLabel" Text="No Limit Hold'em"
                        FontSize="12"
                        TextColor="#A0AAA4"
                        HorizontalTextAlignment="Center" />
@@ -55,46 +56,54 @@
               ColumnDefinitions="*,*,*,*"
               ColumnSpacing="6">
 
-            <Border Grid.Column="0"
-                    Padding="8"
-                    BackgroundColor="#222B25"
-                    StrokeThickness="0">
-
-                <Label Text="Preflop"
-                       TextColor="#46C486"
-                       HorizontalTextAlignment="Center" />
-
-            </Border>
-
-            <Border Grid.Column="1"
+            <Border x:Name="PreFlopBorder"
+                    Grid.Column="0"
                     Padding="8"
                     BackgroundColor="#2FA96D"
                     StrokeThickness="0">
 
-                <Label Text="Flop"
+                <Label x:Name="PreFlopLabel"
+                       Text="Preflop"
                        TextColor="White"
+                       HorizontalTextAlignment="Center" />
+
+            </Border>
+
+            <Border x:Name="FlopBorder"
+                    Grid.Column="1"
+                    Padding="8"
+                    BackgroundColor="#222B25"
+                    StrokeThickness="0">
+
+                <Label x:Name="FlopLabel"
+                       Text="Flop"
+                       TextColor="#A0AAA4"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center" />
 
             </Border>
 
-            <Border Grid.Column="2"
+            <Border x:Name="TurnBorder"
+                    Grid.Column="2"
                     Padding="8"
                     BackgroundColor="#222B25"
                     StrokeThickness="0">
 
-                <Label Text="Turn"
+                <Label x:Name="TurnLabel"
+                       Text="Turn"
                        TextColor="#A0AAA4"
                        HorizontalTextAlignment="Center" />
 
             </Border>
 
-            <Border Grid.Column="3"
+            <Border x:Name="RiverBorder"
+                    Grid.Column="3"
                     Padding="8"
                     BackgroundColor="#222B25"
                     StrokeThickness="0">
 
-                <Label Text="River"
+                <Label x:Name="RiverLabel"
+                       Text="River"
                        TextColor="#A0AAA4"
                        HorizontalTextAlignment="Center" />
 
@@ -226,11 +235,13 @@
         </Grid>
 
         <!-- ACTION BUTTONS -->
-        <Grid Grid.Row="4"
-              ColumnDefinitions="*,*,*"
+        <Grid x:Name="ActionButtonsGrid"
+              Grid.Row="4"
+              ColumnDefinitions="*,*,*,*"
               ColumnSpacing="8">
 
-            <Button Grid.Column="0"
+            <Button x:Name="FoldButton"
+                    Grid.Column="0"
                     Text="FOLD"
                     HeightRequest="54"
                     BackgroundColor="#472522"
@@ -240,7 +251,7 @@
 
             <Button x:Name="CallButton"
                     Grid.Column="1"
-                    Text="CALL 40"
+                    Text="CALL"
                     HeightRequest="54"
                     BackgroundColor="#222B25"
                     TextColor="White"
@@ -249,15 +260,64 @@
 
             <Button Grid.Column="2"
                     x:Name="RaiseButton"
-                    Text="RAISE 120"
+                    Text="RAISE"
                     HeightRequest="54"
                     BackgroundColor="#2FA96D"
                     TextColor="White"
                     FontAttributes="Bold"
                     Clicked="Raise_Clicked" />
+            
+            <Button x:Name="AllInButton"
+            Grid.Column="3"
+            Text="ALL-IN"
+            HeightRequest="54"
+            BackgroundColor="#8B3F91"
+            TextColor="White"
+            FontAttributes="Bold"
+            FontSize="12"
+            Clicked="AllIn_Clicked" />
 
         </Grid>
 
+        <Button x:Name="NextStreetButton"
+        Grid.Row="5"
+        Text="CHUYỂN SANG FLOP"
+        HeightRequest="48"
+        BackgroundColor="#D99B18"
+        TextColor="White"
+        FontAttributes="Bold"
+        IsVisible="False"
+        Clicked="NextStreet_Clicked" />
+
+        <VerticalStackLayout Grid.Row="6" Spacing="8">
+            <VerticalStackLayout x:Name="ShowdownPanel"
+                                 IsVisible="False"
+                                 Spacing="8">
+                <Label Text="Showdown - Chọn người thắng"
+                       TextColor="White"
+                       FontAttributes="Bold" />
+                
+                <ScrollView HeightRequest="180">
+                    <VerticalStackLayout x:Name="PotChoicesLayout" Spacing="4" />
+                </ScrollView>
+
+                <Button x:Name="AwardPotButton"
+                        Text="TRAO POT"
+                        BackgroundColor="#2FA96D"
+                        IsEnabled="False"
+                        Clicked="AwardPot_Clicked" />
+            </VerticalStackLayout>
+            
+            <Label x:Name="HandResultLabel"
+                   TextColor="#F0BD4F"
+                   IsVisible="False" />
+
+            <Button x:Name="NewHandButton"
+            Text="HAND MỚI"
+            IsVisible="False"
+            Clicked="NewHand_Clicked" />
+
+        </VerticalStackLayout>
     </Grid>
 
 </ContentPage>

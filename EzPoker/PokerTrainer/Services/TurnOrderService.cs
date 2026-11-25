@@ -24,6 +24,11 @@ namespace PokerTrainer.Services
                 return true;
             }
 
+            var ableToAct = remainingPlayers.Where(CanPlayerAct).ToArray();
+            if (ableToAct.Length <= 1)
+                return ableToAct.Length == 0 ||
+                    ableToAct[0].StreetCommitted >= hand.CurrentBet;
+
             foreach (Player player in remainingPlayers)
             {
                 // Người all-in không cần hành động thêm

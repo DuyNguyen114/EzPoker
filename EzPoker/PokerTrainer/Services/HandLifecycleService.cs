@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PokerTrainer.Services
 {
-    public class HandLifecycleService
+    public class HandLifecycleService : IHandLifecycleService
     {
         private readonly IBettingService _bettingService;
         private readonly ITurnOrderService _turnOrderService;
@@ -93,7 +93,18 @@ namespace PokerTrainer.Services
 
             _bettingService.PostBigBlind(table, bigBlindPlayer);
 
-            table.SetCurrentPlayerIndex(firstPreFlopIndex);
+            if (playablePlayers.Count(p => !p.IsAllIn) >= 2 && hand.CurrentBet < bigBlind)
+                hand.UpdateCurrentBet(bigBlind);
+
+            if (!_turnOrderService.IsBettingRoundComplete(table))
+            {
+                Player first = table.Players[firstPreFlopIndex];
+                int nextIndex = first.IsAllIn
+                    ? FindNextPlayerWhoCanAct(table, firstPreFlopIndex)
+                    : firstPreFlopIndex;
+                if (nextIndex >= 0)
+                    table.SetCurrentPlayerIndex(nextIndex);
+            }
         }
 
         public void MoveToNextStreet(PokerTable table)
@@ -134,6 +145,12 @@ namespace PokerTrainer.Services
                 return;
             }
 
+            if (_turnOrderService.IsBettingRoundComplete(table))
+            {
+                table.ClearCurrentPlayer();
+                return;
+            }
+
             int buttonIndex = FindPlayerIndexBySeat(table, hand.ButtonSeat);
 
             int firstPostFlopIndex = FindNextPlayerWhoCanAct(table, buttonIndex);
@@ -155,7 +172,7 @@ namespace PokerTrainer.Services
         {
             foreach (Player player in table.Players)
             {
-                player.HasFolded = false;
+                player.HasFolded = player.Stack <= 0;
                 player.IsAllIn = false;
                 player.StreetCommitted = 0;
                 player.TotalCommitted = 0;

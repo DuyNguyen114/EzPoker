@@ -132,14 +132,8 @@ namespace PokerTrainer.Services
                     nameof(actionType));
             }
 
-            if(player.Stack < blindAmount)
-            {
-                throw new InvalidOperationException(
-                $"{player.Name} không đủ chip để đăng blind. " +
-                "All-in blind sẽ được hỗ trợ ở phiên bản sau.");
-            }
-
-            CommitChips(player, blindAmount);
+            decimal posted = Math.Min(player.Stack, blindAmount);
+            CommitChips(player, posted);
 
             if(player.StreetCommitted > hand.CurrentBet)
             {
@@ -151,7 +145,7 @@ namespace PokerTrainer.Services
                 player.Name,
                 hand.CurrentStreet,
                 actionType,
-                blindAmount,
+                posted,
                 player.StreetCommitted);
 
             hand.AddAction(action);
@@ -330,10 +324,14 @@ namespace PokerTrainer.Services
             {
                 hand.RegisterBet(newTotalStreetBet);
             }
-            else
+            else if (newTotalStreetBet > oldCurrentBet)
             {
                 hand.RegisterRaise(newTotalStreetBet);
             }
+            /*else
+            {
+                hand.RegisterRaise(newTotalStreetBet);
+            }*/
             var action = new PokerAction(
                 player.Id,
                 player.Name,

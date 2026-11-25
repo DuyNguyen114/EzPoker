@@ -9,13 +9,13 @@ namespace PokerTrainer.Services
     {
         private readonly IBettingService _bettingService;
         private readonly ITurnOrderService _turnOrderService;
-        private readonly HandLifecycleService _handLifecycleService;
+        private readonly IHandLifecycleService _handLifecycleService;
         private readonly IPotService _potService;
 
         public PokerGameService(
             IBettingService bettingService,
             ITurnOrderService turnOrderService,
-            HandLifecycleService handLifecycleService,
+            IHandLifecycleService handLifecycleService,
             IPotService potService)
         {
             _bettingService =

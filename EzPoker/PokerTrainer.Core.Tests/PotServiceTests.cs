@@ -166,7 +166,7 @@ namespace PokerTrainer.Core.Tests
             // Act: Button/SB fold
             gameService.Fold(table);
 
-            // Assert: BB nhận pot 30
+            // BB nhận pot 20 và được hoàn 10 chip không ai theo.
             Assert.Equal(
                 1010m,
                 bigBlind.Stack);
@@ -186,8 +186,10 @@ namespace PokerTrainer.Core.Tests
                 table.HandHistory[0].WinnerId);
 
             Assert.Equal(
-                30m,
+                20m,
                 table.HandHistory[0].AwardedPot);
+            Assert.Contains(table.HandHistory[0].Payments,
+                p => p.PlayerId == bigBlind.Id && p.PotNumber is null && p.Amount == 10m);
         }
     }
 }

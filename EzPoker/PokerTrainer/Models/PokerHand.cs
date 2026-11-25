@@ -29,6 +29,19 @@ namespace PokerTrainer.Models
         public Guid? WinnerId { get; private set; }
         public string? WinnerName { get; private set; }
         public decimal AwardedPot { get; private set; }
+        public IReadOnlyList<PotPayment> Payments { get; private set; } = Array.Empty<PotPayment>();
+
+        internal void MarkSettled(IReadOnlyList<PotPayment> payments)
+        {
+            Payments = Array.AsReadOnly(payments.ToArray());
+            var awards = payments.Where(p => p.PotNumber.HasValue).ToArray();
+            var winners = awards.Select(p => p.PlayerId).Distinct().ToArray();
+            WinnerId = winners.Length == 1 ? winners[0] : null;
+            WinnerName = string.Join(", ", awards.Select(p => p.PlayerName).Distinct());
+            AwardedPot = awards.Sum(p => p.Amount);
+            CurrentBet = 0;
+            CurrentStreet = PokerStreet.Completed;
+        }
         public PokerHand(int handNumber, int buttonSeat, decimal smallBlind, decimal bigBlind)
         {
             if (handNumber <= 0)
