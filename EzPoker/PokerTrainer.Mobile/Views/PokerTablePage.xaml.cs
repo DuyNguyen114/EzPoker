@@ -22,6 +22,7 @@ public partial class PokerTablePage : ContentPage
     private readonly ITurnOrderService _turnOrderService;
     private readonly PotService _potService = new();
     private readonly List<(int Number, List<(Guid Id, CheckBox Box)> Choices)> _potChoices = new();
+    private readonly IBettingUndo _bettingUndo = new BettingUndo();
 
     public PokerTablePage(PokerTable table, int buttonSeat, decimal smallBlind, decimal bigBlind)
     {
@@ -125,7 +126,7 @@ public partial class PokerTablePage : ContentPage
                 _pokerGameService.Call(
                     _table);
             }
-        });
+        }, true);
     }
 
     private async void Raise_Clicked(
@@ -155,7 +156,7 @@ public partial class PokerTablePage : ContentPage
                         _table,
                         amount);
                 }
-            });
+            }, true);
     }
 
     private async void AllIn_Clicked(
@@ -164,7 +165,7 @@ public partial class PokerTablePage : ContentPage
     {
         await ExecuteActionAsync(
             () => _pokerGameService.AllIn(
-                _table));
+                _table), true);
     }
 
     private async void NextStreet_Clicked(
@@ -464,6 +465,8 @@ public partial class PokerTablePage : ContentPage
 
     private void RefreshTable()
     {
+        UndoButton.IsEnabled = _bettingUndo.CanUndo(_table);
+
         Dictionary<int, string> positionBySeat = BuildPositionBySeat();
 
         var seats = new List<PlayerSeatViewModel>();
@@ -615,14 +618,23 @@ public partial class PokerTablePage : ContentPage
     }
 
     private async Task ExecuteActionAsync(
-    Action action)
+    Action action, bool undoable = false)
     {
         try
         {
             int previousHandCount =
             _table.HandHistory.Count;
 
-            action();
+            //action();
+            if (undoable)
+            {
+                _bettingUndo.Execute(_table, action);
+            }
+            else
+            {
+                action();
+                _bettingUndo.Clear();
+            }
 
             RefreshTable();
 
@@ -772,5 +784,10 @@ public partial class PokerTablePage : ContentPage
             buttonSeat: nextButtonSeat,
             smallBlind: lastHand.SmallBlind,
             bigBlind: lastHand.BigBlind));
+    }
+
+    private void Undo_Clicked(object? sender, EventArgs e)
+    {
+        if (_bettingUndo.TryUndo(_table)) RefreshTable();
     }
 }

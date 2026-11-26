@@ -233,5 +233,13 @@ namespace PokerTrainer.Models
             CurrentBet = 0;
             CurrentStreet = PokerStreet.Completed;
         }
+
+        internal void RestoreBetting(int actionCount, decimal currentBet, decimal minimumRaiseIncrement)
+        {
+            _actions.RemoveRange(actionCount, _actions.Count - actionCount);
+
+            CurrentBet = currentBet;
+            MinimumRaiseIncrement = minimumRaiseIncrement;
+        }
     }
 }

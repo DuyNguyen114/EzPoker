@@ -41,13 +41,16 @@
 
             </VerticalStackLayout>
 
-            <Button Grid.Column="2"
+            <Button x:Name="UndoButton"
+                    Grid.Column="2"
                     Text="↶"
                     FontSize="20"
                     WidthRequest="48"
                     HeightRequest="48"
                     BackgroundColor="#222B25"
-                    TextColor="White" />
+                    TextColor="White"
+                    Clicked="Undo_Clicked"
+                    IsEnabled="False"/>
 
         </Grid>
 
