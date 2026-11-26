@@ -23,15 +23,21 @@ public partial class PokerTablePage : ContentPage
     private readonly PotService _potService = new();
     private readonly List<(int Number, List<(Guid Id, CheckBox Box)> Choices)> _potChoices = new();
     private readonly IBettingUndo _bettingUndo = new BettingUndo();
-
+    private decimal _chipsToAdd;
     public PokerTablePage(PokerTable table, int buttonSeat, decimal smallBlind, decimal bigBlind)
     {
         InitializeComponent();
+
+        PokerTableLayout.SizeChanged += (_, _) => PositionSeatViews();
+
         var betting = new BettingService();
         _turnOrderService = new TurnOrderService();
         _handLifecycleService = new HandLifecycleService(betting, _turnOrderService);
         _pokerGameService = new PokerGameService(betting, _turnOrderService, _handLifecycleService, _potService);
         _table = table;
+
+        BetAmountEntry.TextChanged += (_, _) => RefreshBetDraft();
+
         _handLifecycleService.StartNewHand(table, buttonSeat, smallBlind, bigBlind);
         PokerTableLayout.Loaded += PokerTableLayout_Loaded;
     }
@@ -129,34 +135,32 @@ public partial class PokerTablePage : ContentPage
         }, true);
     }
 
-    private async void Raise_Clicked(
-        object sender,
-        EventArgs e)
+    private async void Raise_Clicked(object? sender, EventArgs e)
     {
-        decimal amount =
-        GetBetAmount();
+        var hand = _table.CurrentHand;
+        var player = _table.CurrentPlayer;
 
-        await ExecuteActionAsync(
-            () =>
+        if (hand is null || player is null ||
+            !TryReadChipDraft(out decimal amount) ||
+            amount < GetMinimumChipsToAdd(hand, player) ||
+            amount >= player.Stack)
+        {
+            RefreshBetDraft();
+            return;
+        }
+
+        await ExecuteActionAsync(() =>
+        {
+            if (hand.CurrentBet == 0)
             {
-                PokerHand hand =
-                    _table.CurrentHand
-                    ?? throw new InvalidOperationException(
-                        "Không có hand đang diễn ra.");
-
-                if (hand.CurrentBet == 0)
-                {
-                    _pokerGameService.Bet(
-                        _table,
-                        amount);
-                }
-                else
-                {
-                    _pokerGameService.RaiseTo(
-                        _table,
-                        amount);
-                }
-            }, true);
+                _pokerGameService.Bet(_table, amount);
+            }
+            else
+            {
+                decimal raiseTo = player.StreetCommitted + amount;
+                _pokerGameService.RaiseTo(_table, raiseTo);
+            }
+        }, undoable: true);
     }
 
     private async void AllIn_Clicked(
@@ -255,11 +259,11 @@ public partial class PokerTablePage : ContentPage
     }
 
 
-    private void DisplaySeats(
+    /*private void DisplaySeats(
     IReadOnlyList<PlayerSeatViewModel> seats)
     {
-        /*double seatWidth = seats.Count == 9 ? 88 : 112;
-        double seatHeight = seats.Count == 9 ? 50 : 62;*/
+        *//*double seatWidth = seats.Count == 9 ? 88 : 112;
+        double seatHeight = seats.Count == 9 ? 50 : 62;*//*
 
         double preferredWidth = seats.Count switch
         {
@@ -325,11 +329,63 @@ public partial class PokerTablePage : ContentPage
                 seatView);
         }
 
-        System.Diagnostics.Debug.WriteLine(
+        *//*System.Diagnostics.Debug.WriteLine(
             $"Số ghế đã hiển thị: {_seatViews.Count}");
 
         System.Diagnostics.Debug.WriteLine(
-            $"Số control trong bàn: {PokerTableLayout.Children.Count}");
+            $"Số control trong bàn: {PokerTableLayout.Children.Count}");*//*
+    }*/
+
+    private void DisplaySeats(IReadOnlyList<PlayerSeatViewModel> seats)
+    {
+        // Chỉ xóa các thẻ ghế; giữ nguyên mặt bàn và pot.
+        foreach (var oldView in _seatViews)
+            PokerTableLayout.Children.Remove(oldView);
+
+        _seatViews.Clear();
+
+        foreach (var seat in seats)
+        {
+            var view = new PokerSeatView(seat) { ZIndex = 10 };
+
+            _seatViews.Add(view);
+            PokerTableLayout.Children.Add(view);
+        }
+
+        PositionSeatViews();
+    }
+
+    private void PositionSeatViews()
+    {
+        double width = PokerTableLayout.Width;
+        double height = PokerTableLayout.Height;
+        int count = _seatViews.Count;
+
+        if (width <= 0 || height <= 0 || count == 0)
+            return;
+
+        double seatWidth = count <= 4 ? 112 : count <= 6 ? 100 : 88;
+        double seatHeight = count <= 4 ? 62 : count <= 6 ? 56 : 50;
+
+        if (count >= 7)
+            seatWidth = Math.Min(seatWidth, width / 4);
+
+        for (int i = 0; i < count; i++)
+        {
+            var view = _seatViews[i];
+            var center = _seatLayoutService.GetSeatCenter(
+                i, count, width, height, seatWidth, seatHeight);
+
+            view.WidthRequest = seatWidth;
+            view.HeightRequest = seatHeight;
+
+            AbsoluteLayout.SetLayoutFlags(view, AbsoluteLayoutFlags.None);
+            AbsoluteLayout.SetLayoutBounds(view, new Rect(
+                center.X - seatWidth / 2,
+                center.Y - seatHeight / 2,
+                seatWidth,
+                seatHeight));
+        }
     }
 
     private void PokerTableLayout_Loaded(
@@ -465,13 +521,17 @@ public partial class PokerTablePage : ContentPage
 
     private void RefreshTable()
     {
+        var playersInSeatOrder = _table.Players
+        .OrderBy(p => p.SeatNumber)
+        .ToList();
+
         UndoButton.IsEnabled = _bettingUndo.CanUndo(_table);
 
         Dictionary<int, string> positionBySeat = BuildPositionBySeat();
 
         var seats = new List<PlayerSeatViewModel>();
 
-        foreach (Player player in _table.Players)
+        foreach (Player player in _table.Players.OrderBy(p => p.SeatNumber))
         {
             var seat = new PlayerSeatViewModel(player,
                 positionBySeat.GetValueOrDefault(player.SeatNumber, "Hết chip"));
@@ -481,7 +541,7 @@ public partial class PokerTablePage : ContentPage
             seats.Add(seat);
         }
 
-        _seatLayoutService.ArrangeSeats(seats);
+        //_seatLayoutService.ArrangeSeats(seats);
 
         DisplaySeats(seats);
 
@@ -558,63 +618,33 @@ public partial class PokerTablePage : ContentPage
     }
     private void RefreshActionButtons()
     {
-        PokerHand? hand =
-        _table.CurrentHand;
+        var hand = _table.CurrentHand;
+        var player = _table.CurrentPlayer;
+        bool canAct = hand is not null && player is not null;
 
-        Player? currentPlayer =
-            _table.CurrentPlayer;
+        FoldButton.IsEnabled = canAct;
+        CallButton.IsEnabled = canAct;
+        AllInButton.IsEnabled = canAct;
 
-        bool canAct =
-            hand is not null &&
-            currentPlayer is not null;
+        // Nơi duy nhất cập nhật BetDraftPanel và RaiseButton.
+        RefreshBetDraft();
 
-        FoldButton.IsEnabled =
-            canAct;
-
-        CallButton.IsEnabled =
-            canAct;
-
-        RaiseButton.IsEnabled =
-            canAct;
-
-        AllInButton.IsEnabled =
-            canAct;
-
-        BetAmountEntry.IsEnabled =
-            canAct;
-
-        if (!canAct)
+        if (hand is null || player is null)
         {
+            CallButton.Text = "CHECK / CALL";
+            AllInButton.Text = "ALL-IN";
             return;
         }
 
-        decimal callAmount =
-        Math.Min(currentPlayer!.Stack, Math.Max(
-                0,
-                hand!.CurrentBet -
-            currentPlayer.StreetCommitted));
+        decimal callAmount = Math.Min(
+            player.Stack,
+            Math.Max(0m, hand.CurrentBet - player.StreetCommitted));
 
-        CallButton.Text =
-            callAmount == 0
-                ? "CHECK"
-                : $"CALL {callAmount:0}";
+        CallButton.Text = callAmount == 0m
+            ? "CHECK"
+            : $"CALL {callAmount:N0}";
 
-        decimal amount = GetBetAmount();
-        decimal maximum = currentPlayer.StreetCommitted + currentPlayer.Stack;
-        RaiseButton.IsEnabled = hand.MinimumRaiseTo < maximum;
-        if (RaiseButton.IsEnabled && (amount < hand.MinimumRaiseTo || amount >= maximum))
-        {
-            amount = hand.MinimumRaiseTo;
-            BetAmountEntry.Text = amount.ToString("0");
-        }
-
-        RaiseButton.Text =
-            hand.CurrentBet == 0
-                ? $"BET {amount:0}"
-                : $"RAISE {amount:0}";
-
-        AllInButton.Text =
-            $"ALL-IN\n{currentPlayer.Stack:0}";
+        AllInButton.Text = $"ALL-IN\n{player.Stack:N0}";
     }
 
     private async Task ExecuteActionAsync(
@@ -635,6 +665,8 @@ public partial class PokerTablePage : ContentPage
                 action();
                 _bettingUndo.Clear();
             }
+
+            BetAmountEntry.Text = string.Empty;
 
             RefreshTable();
 
@@ -789,5 +821,107 @@ public partial class PokerTablePage : ContentPage
     private void Undo_Clicked(object? sender, EventArgs e)
     {
         if (_bettingUndo.TryUndo(_table)) RefreshTable();
+    }
+
+    private decimal GetMinimumChipsToAdd(PokerHand hand, Player player)
+    {
+        return hand.CurrentBet == 0 ? hand.BigBlind : Math.Max(0m, hand.MinimumRaiseTo - player.StreetCommitted);
+    }
+
+    private void ChipDenomination_Clicked(object? sender, EventArgs e)
+    {
+        if (sender is not Button button ||
+            !int.TryParse(button.CommandParameter?.ToString(), out int chip) ||
+            chip <= 0 ||
+            _table.CurrentPlayer is null)
+        {
+            return;
+        }
+
+        decimal current = 0m;
+
+        if (!string.IsNullOrWhiteSpace(BetAmountEntry.Text) &&
+            !TryReadChipDraft(out current))
+        {
+            // Đang nhập tay chưa hợp lệ: không âm thầm ghi đè.
+            return;
+        }
+
+        if (current <= decimal.MaxValue - chip)
+            BetAmountEntry.Text = (current + chip).ToString("0");
+    }
+
+    private bool TryReadChipDraft(out decimal amount)
+    {
+        return decimal.TryParse(BetAmountEntry.Text, out amount)
+            && amount > 0
+            && amount == decimal.Truncate(amount);
+    }
+
+    private void MinimumChips_Clicked(object? sender, EventArgs e)
+    {
+        if (_table.CurrentHand is { } hand &&
+            _table.CurrentPlayer is { } player)
+        {
+            BetAmountEntry.Text = GetMinimumChipsToAdd(hand, player).ToString("0");
+        }
+    }
+
+    private void ClearChipDraft_Clicked(object? sender, EventArgs e)
+    {
+        BetAmountEntry.Text = string.Empty;
+    }
+
+    private void RefreshBetDraft()
+    {
+        var hand = _table.CurrentHand;
+        var player = _table.CurrentPlayer;
+
+        bool canAct = hand is not null && player is not null;
+        BetDraftPanel.IsEnabled = canAct;
+        RaiseButton.IsEnabled = false;
+        BetDraftLabel.Text = string.Empty;
+
+        if (hand is null || player is null)
+            return;
+
+        bool isBet = hand.CurrentBet == 0;
+        RaiseButton.Text = isBet ? "BET" : "RAISE";
+
+        decimal minimum = GetMinimumChipsToAdd(hand, player);
+
+        if (!TryReadChipDraft(out decimal amount))
+        {
+            BetDraftLabel.Text = string.IsNullOrWhiteSpace(BetAmountEntry.Text)
+                ? $"Bỏ thêm tối thiểu: {minimum:N0}"
+                : "Nhập số chip nguyên dương.";
+            return;
+        }
+
+        if (amount > player.Stack)
+        {
+            BetDraftLabel.Text = $"Vượt stack: chỉ còn {player.Stack:N0} chip.";
+            return;
+        }
+
+        if (amount == player.Stack)
+        {
+            BetDraftLabel.Text = "Bằng toàn bộ stack — dùng nút ALL-IN.";
+            return;
+        }
+
+        if (amount < minimum)
+        {
+            BetDraftLabel.Text = $"Bỏ thêm {amount:N0} — tối thiểu {minimum:N0}.";
+            return;
+        }
+
+        decimal target = player.StreetCommitted + amount;
+        BetDraftLabel.Text = isBet
+            ? $"Bỏ thêm {amount:N0} chip"
+            : $"Bỏ thêm {amount:N0} · Raise lên {target:N0}";
+
+        RaiseButton.Text = isBet ? $"BET {amount:N0}" : $"RAISE {target:N0}";
+        RaiseButton.IsEnabled = true;
     }
 }

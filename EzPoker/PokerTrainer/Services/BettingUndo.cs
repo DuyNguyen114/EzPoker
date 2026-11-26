@@ -10,7 +10,14 @@ namespace PokerTrainer.Services
     {
         private Snapshot? _previous;
         public void Clear() => _previous = null;
-        public bool CanUndo(PokerTable table) => _previous is { } snapshot && ReferenceEquals(table.CurrentHand, snapshot.Hand) && snapshot.Hand.CurrentStreet == snapshot.Street;
+        public bool CanUndo(PokerTable table)
+        {
+            var snapshot = _previous;
+
+            return snapshot is not null
+                && ReferenceEquals(table.CurrentHand, snapshot.Hand)
+                && snapshot.Hand.CurrentStreet == snapshot.Street;
+        } 
     
         public void Execute(PokerTable table, Action action)
         {
@@ -30,6 +37,11 @@ namespace PokerTrainer.Services
             //if (!CanUndo(table) || _previous is { } not snapshot) return false;
 
             var snapshot = _previous;
+
+            if (snapshot is null || !CanUndo(table))
+            {
+                return false;
+            }
 
             for(int i = 0; i < table.Players.Count; i++)
             {

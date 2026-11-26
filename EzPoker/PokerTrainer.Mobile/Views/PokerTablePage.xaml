@@ -208,7 +208,7 @@
         </AbsoluteLayout>
 
         <!-- BET AMOUNT -->
-        <Grid Grid.Row="3"
+        <!--<Grid Grid.Row="3"
               ColumnDefinitions="48,*,48"
               ColumnSpacing="8">
 
@@ -235,7 +235,65 @@
                     TextColor="White"
                     Clicked="IncreaseBet_Clicked" />
 
-        </Grid>
+        </Grid>-->
+        <VerticalStackLayout x:Name="BetDraftPanel"
+                             Grid.Row="3"
+                             Spacing="6"
+                             IsEnabled="False">
+            <Grid ColumnDefinitions="*,*,*"
+                  RowDefinitions="Auto,Auto"
+                  ColumnSpacing="6"
+                  RowSpacing="6">
+                <Button Grid.Row="0" Grid.Column="0"
+                        Text="+100" CommandParameter="100"
+                        Clicked="ChipDenomination_Clicked">
+                </Button>
+
+                <Button Grid.Row="0" Grid.Column="1"
+                        Text="+200" CommandParameter="200"
+                        Clicked="ChipDenomination_Clicked">         
+                </Button>
+
+                <Button Grid.Row="0" Grid.Column="2"
+                        Text="+500" CommandParameter="500"
+                        Clicked="ChipDenomination_Clicked"> 
+                </Button>
+
+                <Button Grid.Row="1" Grid.Column="0"
+                        Text="+1.000" CommandParameter="1000"
+                        Clicked="ChipDenomination_Clicked" />
+
+                <Button Grid.Row="1" Grid.Column="1"
+                        Text="+2.000" CommandParameter="2000"
+                        Clicked="ChipDenomination_Clicked" />
+
+                <Button Grid.Row="1" Grid.Column="2"
+                        Text="+5.000" CommandParameter="5000"
+                        Clicked="ChipDenomination_Clicked" />
+
+            </Grid>
+
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                <Entry x:Name="BetAmountEntry"
+               Placeholder="Chip bỏ thêm"
+               Keyboard="Numeric"
+               TextColor="White"
+               PlaceholderColor="#A0AAA4" />
+
+                <Button Grid.Column="1"
+                Text="Tối thiểu"
+                Clicked="MinimumChips_Clicked" />
+
+                <Button Grid.Column="2"
+                Text="Xóa"
+                Clicked="ClearChipDraft_Clicked" />
+            </Grid>
+
+            <Label x:Name="BetDraftLabel"
+           TextColor="#B9C8BF"
+           FontSize="12" />
+
+        </VerticalStackLayout>
 
         <!-- ACTION BUTTONS -->
         <Grid x:Name="ActionButtonsGrid"
