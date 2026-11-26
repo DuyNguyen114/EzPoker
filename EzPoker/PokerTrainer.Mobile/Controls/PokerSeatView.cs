@@ -19,8 +19,8 @@ public class PokerSeatView : ContentView
             throw new ArgumentNullException(
                 nameof(seat));
 
-        WidthRequest = 112;
-        HeightRequest = 62;
+        //WidthRequest = 112;
+        //HeightRequest = 62;
 
         _nameLabel =
             new Label
@@ -59,8 +59,8 @@ public class PokerSeatView : ContentView
         _container =
             new Border
             {
-                WidthRequest = 112,
-                HeightRequest = 62,
+                //WidthRequest = 112,
+                //HeightRequest = 62,
 
                 Padding =
                     new Thickness(9, 6),
@@ -87,8 +87,9 @@ public class PokerSeatView : ContentView
         _nameLabel.Text =
             $"{_seat.Position} • {_seat.Name}";
 
-        _statusLabel.Text =
-            _seat.StatusText;
+        //_statusLabel.Text = _seat.StatusText;
+
+        _statusLabel.Text = $"{_seat.Stack:0.##} chip";
 
         IsVisible = true;
         Opacity = 1;
@@ -103,6 +104,8 @@ public class PokerSeatView : ContentView
 
             Opacity = 0.45;
 
+            _statusLabel.Text += " · Fold";
+
             return;
         }
 
@@ -113,6 +116,8 @@ public class PokerSeatView : ContentView
                 strokeColor: "#E46B65",
                 statusColor: "#E46B65",
                 strokeThickness: 3);
+
+            _statusLabel.Text += " · All-in";
 
             return;
         }

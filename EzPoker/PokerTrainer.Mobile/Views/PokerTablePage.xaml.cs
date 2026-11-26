@@ -257,10 +257,33 @@ public partial class PokerTablePage : ContentPage
     private void DisplaySeats(
     IReadOnlyList<PlayerSeatViewModel> seats)
     {
-        /*
-         * Chỉ xóa các ghế cũ.
-         * Không xóa Border mặt bàn đang có trong XAML.
-         */
+        /*double seatWidth = seats.Count == 9 ? 88 : 112;
+        double seatHeight = seats.Count == 9 ? 50 : 62;*/
+
+        double preferredWidth = seats.Count switch
+        {
+            <= 4 => 112,
+            <= 6 => 100,
+            _    => 88
+        };
+
+        double tableWidth = PokerTableLayout.Width;
+        double seatWidth = preferredWidth;
+
+        if(tableWidth > 0 && seats.Count >= 7)
+        {
+            const double gap = 8;
+            //vi tri 3 ghe tren cung
+            seatWidth = Math.Min(preferredWidth, (tableWidth - 2 * gap) / 3);
+        }
+
+        double seatHeight = seats.Count switch
+        {
+            <= 4 => 62,
+            <= 6 => 56,
+            _ => 50
+        };
+
         foreach (PokerSeatView oldSeatView
                  in _seatViews)
         {
@@ -277,7 +300,9 @@ public partial class PokerTablePage : ContentPage
                 new PokerSeatView(seat)
                 {
                     ZIndex = 10,
-                    IsVisible = true
+                    IsVisible = true,
+                    WidthRequest = seatWidth,
+                    HeightRequest = seatHeight
                 };
 
             AbsoluteLayout.SetLayoutBounds(
@@ -285,8 +310,8 @@ public partial class PokerTablePage : ContentPage
                 new Rect(
                     seat.X,
                     seat.Y,
-                    112,
-                    62));
+                    seatWidth,
+                    seatHeight));
 
             AbsoluteLayout.SetLayoutFlags(
                 seatView,
