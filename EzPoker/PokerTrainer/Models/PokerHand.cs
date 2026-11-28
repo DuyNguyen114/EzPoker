@@ -30,6 +30,85 @@ namespace PokerTrainer.Models
         public string? WinnerName { get; private set; }
         public decimal AwardedPot { get; private set; }
         public IReadOnlyList<PotPayment> Payments { get; private set; } = Array.Empty<PotPayment>();
+        private readonly Dictionary<PokerStreet, PokerCard[]> _boardByStreet = new();
+        public Guid HistoryId { get; } = Guid.NewGuid();
+
+
+        public HandHistoryRecord CreateHistoryRecord()
+        {
+            return new HandHistoryRecord(
+                HistoryId,
+                DateTimeOffset.UtcNow,
+                HeroSeatNumber,
+                HeroHoleCards.ToArray(),
+                GetRevealedCards(PokerStreet.Flop).ToArray(),
+                GetRevealedCards(PokerStreet.Turn).ToArray(),
+                GetRevealedCards(PokerStreet.River).ToArray(),
+                CopyShowdownCards());
+        }
+        private static readonly PokerStreet[] BoardStreets =
+        {
+            PokerStreet.Flop, PokerStreet.Turn, PokerStreet.River
+        };
+
+        private PokerCard[] _heroHoleCards = Array.Empty<PokerCard>();
+
+        public int? HeroSeatNumber { get; private set; }
+
+        public IReadOnlyList<PokerCard> HeroHoleCards => Array.AsReadOnly(_heroHoleCards);
+        private readonly Dictionary<int, PokerCard[]> _showdownCardsBySeat = new();
+        public IReadOnlyList<PokerCard> GetRevealedCards(PokerStreet street)
+        {
+            return _boardByStreet.TryGetValue(street, out var cards) ? Array.AsReadOnly(cards) : Array.Empty<PokerCard>();
+        }
+        public IReadOnlyList<PokerCard> GetBoardThrough(PokerStreet street)
+        {
+            return BoardStreets.Where(s => s <= street).SelectMany(GetRevealedCards).ToArray();
+        }
+        public void SetBoardCards(PokerStreet street, params PokerCard[] cards)
+        {
+            if (!BoardStreets.Contains(street) || street > CurrentStreet || CurrentStreet == PokerStreet.Completed)
+            {
+                throw new InvalidOperationException("Chỉ nhập bài cho vòng đã đến trong hand đang chơi");
+            }
+
+            int expectedCount = street == PokerStreet.Flop ? 3 : 1;
+
+            var otherCards = _boardByStreet.Where(entry => entry.Key != street).SelectMany(entry => entry.Value).Concat(_heroHoleCards);
+
+            ValidateCards(cards, expectedCount, otherCards);
+            _boardByStreet[street] = cards.ToArray();
+        }
+
+        public void SetHeroCards(int seatNumber, params PokerCard[] cards)
+        {
+            if(CurrentStreet == PokerStreet.Completed)
+            {
+                throw new InvalidOperationException("Hand đã kết thúc");
+            }
+            if (seatNumber <= 0) throw new ArgumentOutOfRangeException(nameof(seatNumber));
+
+            ValidateCards(cards, 2, _boardByStreet.Values.SelectMany(x => x));
+
+            HeroSeatNumber = seatNumber;
+            _heroHoleCards = cards.ToArray();
+        }
+
+        private static void ValidateCards(PokerCard[] cards, int expectedCount, IEnumerable<PokerCard> otherCards)
+        {
+            ArgumentNullException.ThrowIfNull(cards);
+
+            if (cards.Length != expectedCount || cards.Any(c => c.Rank < 2 || c.Rank > 14 || !System.Enum.IsDefined(c.Suit)))
+            {
+                throw new ArgumentException($"Cần đúng {expectedCount} lá bài hợp lệ.", nameof(cards));
+            } 
+
+            if(cards.Distinct().Count() != cards.Length || cards.Intersect(otherCards).Any())
+            {
+                throw new ArgumentException("Có lá bài bị trùng.", nameof(cards));
+            }
+        }
+
 
         internal void MarkSettled(IReadOnlyList<PotPayment> payments)
         {
@@ -240,6 +319,40 @@ namespace PokerTrainer.Models
 
             CurrentBet = currentBet;
             MinimumRaiseIncrement = minimumRaiseIncrement;
+        }
+
+        public void SetShowDownCards(int seatNumber, PokerCard first, PokerCard second)
+        {
+            if (CurrentStreet != PokerStreet.Showdown)
+                throw new InvalidOperationException("Chỉ ghi bài đã lật ở Showdown.");
+
+            if (seatNumber <= 0)
+                throw new ArgumentOutOfRangeException(nameof(seatNumber));
+
+            if (seatNumber == HeroSeatNumber)
+                throw new ArgumentException("Bài Hero đã được ghi riêng.");
+
+            if (first == second)
+                throw new ArgumentException("Hai lá bài không được trùng nhau.");
+
+            var usedCards = GetBoardThrough(PokerStreet.River)
+                .Concat(HeroHoleCards)
+                .Concat(_showdownCardsBySeat
+                    .Where(entry => entry.Key != seatNumber)
+                    .SelectMany(entry => entry.Value))
+                .ToHashSet();
+
+            if (usedCards.Contains(first) || usedCards.Contains(second))
+                throw new ArgumentException("Lá bài đã được ghi ở board hoặc ghế khác.");
+
+            _showdownCardsBySeat[seatNumber] = [first, second];
+        }
+
+        public Dictionary<int, PokerCard[]> CopyShowdownCards()
+        {
+            return _showdownCardsBySeat.ToDictionary(
+                entry => entry.Key,
+                entry => entry.Value.ToArray());
         }
     }
 }

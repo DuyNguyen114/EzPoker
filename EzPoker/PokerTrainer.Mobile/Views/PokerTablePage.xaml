@@ -7,9 +7,9 @@
     Title="Poker Table"
     BackgroundColor="#101512">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto"
-          Padding="16"
-          RowSpacing="12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto"
+          Padding="12"
+          RowSpacing="8">
 
         <!-- HEADER -->
         <Grid Grid.Row="0"
@@ -38,6 +38,12 @@
                        FontSize="12"
                        TextColor="#A0AAA4"
                        HorizontalTextAlignment="Center" />
+
+                <Button x:Name="EditBoardButton"
+                        Text="Nhập bài chung"
+                        HorizontalOptions="Center"
+                        IsVisible="False"
+                        Clicked="EditBoard_Clicked" />
 
             </VerticalStackLayout>
 
@@ -114,10 +120,20 @@
 
         </Grid>
 
+        <!-- Community cards -->
+        <Label x:Name="BoardLabel"
+               Grid.Row="2"
+               IsVisible="False"
+               FontSize="20"
+               FontAttributes="Bold"
+               TextColor="White"
+               HorizontalTextAlignment="Center"
+               Margin="0,2,0,2" />
+
         <!-- POKER TABLE -->
         <AbsoluteLayout x:Name="PokerTableLayout"
-                        Grid.Row="2"
-                        MinimumHeightRequest="380">
+                        Grid.Row="3"
+                        IsClippedToBounds="True">
 
             <!-- Mặt bàn -->
             <Border ZIndex="0"
@@ -134,7 +150,7 @@
                 <VerticalStackLayout
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    Spacing="12">
+                    Spacing="4">
 
                     <Label Text="TỔNG POT"
                            FontSize="12"
@@ -142,7 +158,7 @@
                            HorizontalTextAlignment="Center" />
 
                     <Label x:Name="PotLabel"
-                           Text="180"
+                           Text="0"
                            FontSize="32"
                            FontAttributes="Bold"
                            TextColor="White"
@@ -155,89 +171,15 @@
                            HorizontalTextAlignment="Center"
                         />
 
-                    <!-- Community cards -->
-                    <HorizontalStackLayout Spacing="6">
-
-                        <Border WidthRequest="42"
-                                HeightRequest="56"
-                                BackgroundColor="White"
-                                StrokeThickness="0">
-
-                            <Label Text="K♥"
-                                   TextColor="#C83E3E"
-                                   FontSize="18"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-
-                        </Border>
-
-                        <Border WidthRequest="42"
-                                HeightRequest="56"
-                                BackgroundColor="White"
-                                StrokeThickness="0">
-
-                            <Label Text="8♠"
-                                   TextColor="#172019"
-                                   FontSize="18"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-
-                        </Border>
-
-                        <Border WidthRequest="42"
-                                HeightRequest="56"
-                                BackgroundColor="White"
-                                StrokeThickness="0">
-
-                            <Label Text="3♦"
-                                   TextColor="#C83E3E"
-                                   FontSize="18"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-
-                        </Border>
-
-                    </HorizontalStackLayout>
-
                 </VerticalStackLayout>
 
             </Border>
 
-            
-
         </AbsoluteLayout>
 
         <!-- BET AMOUNT -->
-        <!--<Grid Grid.Row="3"
-              ColumnDefinitions="48,*,48"
-              ColumnSpacing="8">
-
-            <Button Grid.Column="0"
-                    Text="−"
-                    FontSize="22"
-                    BackgroundColor="#222B25"
-                    TextColor="White"
-                    Clicked="DecreaseBet_Clicked" />
-
-            <Entry x:Name="BetAmountEntry"
-                   Grid.Column="1"
-                   Text="120"
-                   Keyboard="Numeric"
-                   HorizontalTextAlignment="Center"
-                   TextColor="White"
-                   BackgroundColor="#19201C"
-                   Placeholder="Số chip" />
-
-            <Button Grid.Column="2"
-                    Text="+"
-                    FontSize="22"
-                    BackgroundColor="#222B25"
-                    TextColor="White"
-                    Clicked="IncreaseBet_Clicked" />
-
-        </Grid>-->
         <VerticalStackLayout x:Name="BetDraftPanel"
-                             Grid.Row="3"
+                             Grid.Row="4"
                              Spacing="6"
                              IsEnabled="False">
             <Grid ColumnDefinitions="*,*,*"
@@ -251,12 +193,12 @@
 
                 <Button Grid.Row="0" Grid.Column="1"
                         Text="+200" CommandParameter="200"
-                        Clicked="ChipDenomination_Clicked">         
+                        Clicked="ChipDenomination_Clicked">
                 </Button>
 
                 <Button Grid.Row="0" Grid.Column="2"
                         Text="+500" CommandParameter="500"
-                        Clicked="ChipDenomination_Clicked"> 
+                        Clicked="ChipDenomination_Clicked">
                 </Button>
 
                 <Button Grid.Row="1" Grid.Column="0"
@@ -297,7 +239,7 @@
 
         <!-- ACTION BUTTONS -->
         <Grid x:Name="ActionButtonsGrid"
-              Grid.Row="4"
+              Grid.Row="5"
               ColumnDefinitions="*,*,*,*"
               ColumnSpacing="8">
 
@@ -327,7 +269,7 @@
                     TextColor="White"
                     FontAttributes="Bold"
                     Clicked="Raise_Clicked" />
-            
+
             <Button x:Name="AllInButton"
             Grid.Column="3"
             Text="ALL-IN"
@@ -341,7 +283,7 @@
         </Grid>
 
         <Button x:Name="NextStreetButton"
-        Grid.Row="5"
+        Grid.Row="6"
         Text="CHUYỂN SANG FLOP"
         HeightRequest="48"
         BackgroundColor="#D99B18"
@@ -350,14 +292,17 @@
         IsVisible="False"
         Clicked="NextStreet_Clicked" />
 
-        <VerticalStackLayout Grid.Row="6" Spacing="8">
+        <VerticalStackLayout Grid.Row="7" Spacing="8">
             <VerticalStackLayout x:Name="ShowdownPanel"
                                  IsVisible="False"
                                  Spacing="8">
                 <Label Text="Showdown - Chọn người thắng"
                        TextColor="White"
                        FontAttributes="Bold" />
-                
+                <Button x:Name="EditShowdownCardsButton"
+                        Text="Nhập bài đã lật"
+                        Clicked="EditShowdownCards_Clicked" />
+
                 <ScrollView HeightRequest="180">
                     <VerticalStackLayout x:Name="PotChoicesLayout" Spacing="4" />
                 </ScrollView>
@@ -368,7 +313,7 @@
                         IsEnabled="False"
                         Clicked="AwardPot_Clicked" />
             </VerticalStackLayout>
-            
+
             <Label x:Name="HandResultLabel"
                    TextColor="#F0BD4F"
                    IsVisible="False" />
